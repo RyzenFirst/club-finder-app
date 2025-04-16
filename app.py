@@ -1,22 +1,20 @@
+from openai import OpenAI
 import streamlit as st
-import openai
 import json
 
-# Load the constant JSON
-with open("clubs.json", "r") as f:
+# Load clubs
+with open("clubs.json") as f:
     clubs = json.load(f)
 
-openai.api_key = st.secrets["openai_api_key"]
+client = OpenAI(api_key=st.secrets["openai_api_key"])
 
 st.title("🎓 Club Finder")
-st.write("Tell me what you're interested in, and I'll find the best student club for you!")
-
 query = st.text_input("What kind of club are you looking for?")
 
 if st.button("Find Club") and query:
     full_data = json.dumps(clubs, indent=2)
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {
@@ -31,4 +29,4 @@ if st.button("Find Club") and query:
     )
 
     st.subheader("💡 Recommended Club")
-    st.write(response.choices[0].message["content"])
+    st.write(response.choices[0].message.content)
